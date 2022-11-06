@@ -1,0 +1,15 @@
+// Fred Swartz
+// http://www.fredosaurus.com/notes-cpp/algorithms/sorting/bubblesort2.html
+void bubbleSort3(int x[], int n) {
+  bool exchanges;
+  do {
+    n--;               // make loop smaller each time.
+    exchanges = false; // assume this is last pass over array
+    for (int i=0; i<n; i++) {
+      if (x[i] > x[i+1]) {
+        int temp = x[i];  x[i] = x[i+1];  x[i+1] = temp;
+        exchanges = true;  // after an exchange, must look again 
+      }
+    }
+  } while (exchanges);
+}

@@ -1,81 +1,170 @@
 #include <iostream>
-#include <iomanip>
-#include <vector>
 using namespace std;
 
-class Items {
-    private:
-        string item;
-        double cost;
-    public:
-        Items() {
-            item = "";
-            cost = 0;
-        }
-        Items(string itemName, double value) {
-            item = itemName;
-            cost = value;
-        }
-        void SetItemName(string itemName) {
-            item = itemName;
-        }
-        void SetItemCost(double value) {
-            cost = value;
-        }
-        string GetItemName() {
-            return item;
-        }
-        double GetItemCost() {
-            return cost;
-        }
-};
-
-int main() {
-    cout << fixed << setprecision(2);
-    double maxCost;
-    int maxItems;
-    cin >> maxCost;
-    cin >> maxItems;
-
-    string itemName;
-    double cost;
-    Items items[maxItems];
-    for (int i = 0; i < maxItems; i++) {
-        cin >> itemName;
-        cin >> cost;
-        items[i].SetItemName(itemName);
-        items[i].SetItemCost(cost);
+int *Merge(int A[], int B[], int sizeA, int sizeB) {
+    int sizeC = sizeA + sizeB;
+    int *C = new int(sizeC);
+    int i = 0;
+    // merge A and B to create C
+    for (int j = 0; j < sizeA; j++) {
+        C[i] = A[j];
+        i++;
+    }
+    for (int k = 0; k < sizeB; k++) {
+        C[i] = B[k];
+        i++;
     }
 
-    // sort items
-    Items temp;
+    // sort C
+    int temp;
     int j = 0;
-    for (int i = 1; i < maxItems; i++) {
+    for (int i = 0; i < sizeC; i++) {
         j = i;
-        while (j > 0 && items[j].GetItemCost() > items[j-1].GetItemCost()) {
-            temp = items[j-1];
-            items[j-1] = items[j];
-            items[j] = temp;
+        while (j > 0 && C[j] < C[j-1]) {
+            temp = C[j-1];
+            C[j-1] = C[j];
+            C[j] = temp;
+            j--;
+        }
+    }
+    return C;
+}
+
+int main() {
+    // PART 1 * * * * * * * * * * * *
+    cout << "PART 1" << endl;
+    // get sizes a and b (no larger than 10)
+    int a, b;
+    do {
+        cout << "a = ";
+        cin >> a;
+    } while (a > 10);
+    do {
+        cout << "b = ";
+        cin >> b;
+    } while (b > 10);
+
+    // input random elements into array A and B
+    int A[a];
+    int B[b];
+    for (int i = 0; i < a; i++) {
+        A[i] = (rand() % 100);
+    }
+    for (int j = 0; j < b; j++) {
+        B[j] = (rand() % 100);
+    }
+
+    // sort A
+    int temp;
+    int j = 0;
+    for (int i = 0; i < a; i++) {
+        j = i;
+        while (j > 0 && A[j] < A[j-1]) {
+            temp = A[j-1];
+            A[j-1] = A[j];
+            A[j] = temp;
+            j--;
+        }
+    }
+    // sort B
+    j = 0;
+    for (int i = 0; i < b; i++) {
+        j = i;
+        while (j > 0 && B[j] < B[j-1]) {
+            temp = B[j-1];
+            B[j-1] = B[j];
+            B[j] = temp;
             j--;
         }
     }
 
-    // select which items to purchase
-    vector<Items> purchased;
-    double sum = 0;
-    for (int j = 0; j < maxItems; j++) {
-        if (sum + items[j].GetItemCost() <= maxCost) {
-            sum += items[j].GetItemCost();
-            purchased.push_back(items[j]);
+    // merge/swap loop
+    int index = 0;
+    while (index < a) {
+        if (B[0] < A[index]) {
+            temp = A[index];
+            A[index] = B[0];
+            B[0] = temp;
         }
+        // re-sort B
+        int j = 0;
+        for (int i = 0; i < b; i++) {
+            j = i;
+            while (j > 0 && B[j] < B[j-1]) {
+                temp = B[j-1];
+                B[j-1] = B[j];
+                B[j] = temp;
+                j--;
+            }
+        }
+        index++;
     }
 
-    // display purchased items
-    for (int k = 0; k < purchased.size(); k++) {
-        cout << purchased[k].GetItemName() << " " << purchased[k].GetItemCost() << endl;
+    // display arrays
+    cout << "A[] = { ";
+    for (int i = 0; i < a; i++) {
+        if (i != a-1)
+            cout << A[i] << ", ";
+        else
+            cout << A[i] << " }" << endl;
     }
-    if (maxCost - sum != 0)
-        cout << maxCost - sum << endl;
+    cout << "B[] = { ";
+    for (int j = 0; j < b; j++) {
+        if (j != b-1)
+            cout << B[j] << ", ";
+        else
+            cout << B[j] << " }" << endl;
+    }
+    cout << endl;
+
+
+
+    // PART 2 * * * * * * * * * * *
+    cout << "PART 2" << endl;
+    // get size a and b (no larger than 10)
+    do {
+        cout << "a = ";
+        cin >> a;
+    } while (a > 10);
+    do {
+        cout << "b = ";
+        cin >> b;
+    } while (b > 10);
+
+    // input elements into arrays A and B
+    A[a] = {};
+    B[b] = {};
+    for (int i = 0; i < a; i++) {
+        A[i] = (rand() % 100);
+    }
+    for (int j = 0; j < b; j++) {
+        B[j] = (rand() % 100);
+    }
+
+    int *C = Merge(A, B, a, b);
+
+    // display arrays A, B, and C
+    cout << "A[] = { ";
+    for (int i = 0; i < a; i++) {
+        if (i != a-1)
+            cout << A[i] << ", ";
+        else
+            cout << A[i] << " }" << endl;
+    }
+    cout << "B[] = { ";
+    for (int j = 0; j < b; j++) {
+        if (j != b-1)
+            cout << B[j] << ", ";
+        else
+            cout << B[j] << " }" << endl;
+    }
+    cout << "C[] = { ";
+    for (int k = 0; k < (a+b); k++) {
+        if (k != (a+b)-1)
+            cout << C[k] << ", ";
+        else
+            cout << C[k] << " }" << endl;
+    }
 
     return 0;
 }

@@ -1,21 +1,78 @@
 #include <iostream>
-#include "Author.h"
-#include "Book.h"
+#include <iomanip>
+#include <vector>
+#include "Employee.h"
+#include "SalariedEmployee.h"
+#include "HourlyEmployee.h"
+#include "CommissionEmployee.h"
+#include "BasePlusCommissionEmployee.h"
 using namespace std;
 
-int main() {
-    Author peter("Peter Jones", "peter@somewhere.com", 'm');
-    Book cppDummy("C++ for Dummies", peter, 19.99, 0);
-    cppDummy.print();
-    cppDummy.setQtyInStock(88);
-    cppDummy.print();
-    cout << cppDummy.getQtyInStock() << endl;
-    cout << cppDummy.getPrice() << endl;
-    cout << cppDummy.getAuthor().getName() << endl;
-    cout << cppDummy.getAuthor().getEmail() << endl;
-    cout << cppDummy.getAuthorName() << endl;
-    Book moreCpp("More C++ for Dummies", peter, -19.99, 0);
-    cout << moreCpp.getPrice() << endl;
+void virtualViaPointer( Employee *  ); // prototype
+void virtualViaReference(  Employee & ); // prototype
 
-    return 0;
-}
+int main()
+{
+    // set floating-point output formatting
+    cout << fixed << setprecision( 2 );
+
+    // create derived-class objects
+    SalariedEmployee salariedEmployee("John", "Smith", "111-11-1111", 800 );
+    HourlyEmployee hourlyEmployee("Karen", "Price", "222-22-2222", 16.75, 40 );
+    CommissionEmployee commissionEmployee("Sue", "Jones", "333-33-3333", 10000, .06 );
+    BasePlusCommissionEmployee basePlusCommissionEmployee("Bob", "Lewis", "444-44-4444", 5000, .04, 300 );
+
+    cout << "Employees processed individually using static binding:\n\n";
+
+    // output each Employee’s information and earnings using static binding
+    salariedEmployee.print();
+    cout << "\nearned $" <<salariedEmployee.earnings() << "\n\n";
+    hourlyEmployee.print();
+    cout << "\nearned $" <<hourlyEmployee.earnings() << "\n\n";
+    commissionEmployee.print();
+    cout << "\nearned $" << commissionEmployee.earnings()<< "\n\n";
+    basePlusCommissionEmployee.print();
+    cout << "\nearned $" << basePlusCommissionEmployee.earnings()<< "\n\n";
+
+    // create vector of four base-class pointers
+    vector < Employee * > employees( 4 );
+
+    // initialize vector with Employees
+    employees[ 0 ] = &salariedEmployee;
+    employees[ 1 ] = &hourlyEmployee;
+    employees[ 2 ] = &commissionEmployee;
+    employees[ 3 ] = &basePlusCommissionEmployee;
+
+    cout << "Employees processed polymorphically via dynamic binding:\n\n";
+
+    // call virtualViaPointer to print each Employee's information
+    // and earnings using dynamic binding
+    cout << "Virtual function calls made off base-class pointers:\n\n";
+
+    for ( int i = 0; i < employees.size(); i++ )
+        virtualViaPointer( employees[ i ] );
+
+    // call virtualViaReference to print each Employee's information
+    // and earnings using dynamic binding
+    cout << "Virtual function calls made off base-class references:\n\n";
+
+    for ( int i = 0; i < employees.size(); i++ )
+        virtualViaReference( *employees[ i ] ); // note dereferencing
+
+}// end main
+
+// call Employee virtual functions print and earnings off a
+// base-class pointer using dynamic binding
+void virtualViaPointer(  Employee *  baseClassPtr )
+{
+    baseClassPtr->print();
+    cout << "\nearned $" << baseClassPtr->earnings() << "\n\n";
+} // end function virtualViaPointer
+
+// call Employee virtual functions print and earnings off a
+// base-class reference using dynamic binding
+void virtualViaReference(  Employee &baseClassRef )
+{
+    baseClassRef.print();
+    cout << "\nearned $" << baseClassRef.earnings() << "\n\n";
+} // end function virtualViaReference

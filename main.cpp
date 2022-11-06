@@ -1,171 +1,51 @@
 #include <iostream>
+
+#include "Vehicle.h"
+#include "Car.h"
+#include "Truck.h"
+#include "Tanker.h"
 using namespace std;
 
-class Link {
-    public:
-        double dData;
-        Link* pNext;
-        Link* pPrevious;
+void Print(Vehicle *);
 
-    public:
-        Link(double dd): dData(dd), pNext(NULL), pPrevious(NULL) {}
-        void displayLink() {
-            cout << dData << " ";
-        }
-};
+int main()
+{
+    const int NUM_VEHICLES = 8;
 
-class DoublyLinkedList {
-    private:
-        Link* pFirst;
-        Link* pLast;
+    Car car_1("CAR1_123123123",2);
+    Car car_2("CAR2_1231231234",4);
 
-    public:
-        DoublyLinkedList() : pFirst(NULL), pLast(NULL) {}
-        ~DoublyLinkedList() {
-            Link* pCurrent = pFirst;
-            while (pCurrent != NULL) {
-                Link* pOldCur = pCurrent;
-                pCurrent = pCurrent -> pNext;
-                delete pOldCur;
-            }
-        }
+    Truck truck_1("TRK1_3123123123",2000);
 
-        bool isEmpty() {
-            return pFirst == NULL;
-        }
+    Truck truck_2("TRK2_4567890123",2100);
 
-        void insertFirst(double dd) {
-            Link* pNewLink = new Link(dd);
-            if (isEmpty())
-                pLast = pNewLink;
-            else
-                pFirst -> pPrevious = pNewLink;
-            pNewLink -> pNext = pFirst;
-            pFirst = pNewLink;
-        }
+    Tanker tanktruck_1("TNKTRK1_3123456",2000);
 
-        void insertLast(double dd) {
-            Link* pNewLink = new Link(dd);
-            if (isEmpty())
-                pFirst = pNewLink;
-            else {
-                pLast -> pNext = pNewLink;
-                pNewLink -> pPrevious = pLast;
-            }
-            pLast = pNewLink;
-        }
+    Tanker tanktruck_2("TNKTRK2_3456789", 2100);
 
-        void removeFirst() {
-            Link* pTemp = pFirst;
-            if (pFirst -> pNext == NULL)
-                pLast = NULL;
-            else
-                pFirst -> pNext -> pPrevious = NULL;
-            pFirst = pFirst -> pNext;
+    truck_1.setTaxRate(0.10,0.15);
+    tanktruck_1.setTaxRate(0.10,0.15);
 
-            delete pTemp;
-        }
+    // Pointer to array of vehicle objects
+    Vehicle *vehiclePtr[NUM_VEHICLES] =
+            {
+                    &car_1,
+                    &car_2,
+                    &truck_1,
+                    &truck_2,
+                    &tanktruck_1,
+                    &tanktruck_2
+            };
 
-        void removeLast() {
-            Link* pTemp = pLast;
-            if (pFirst -> pNext == NULL)
-                pFirst = NULL;
-            else
-                pLast -> pPrevious -> pNext = NULL;
-            pLast = pLast -> pPrevious;
-            delete pTemp;
-        }
-
-        bool insertAfter(double key, double dd) {
-            Link* pCurrent = pFirst;
-            while (pCurrent -> dData != key) {
-                pCurrent = pCurrent -> pNext;
-                if(pCurrent == NULL)
-                    return false;
-            }
-            Link* pNewLink = new Link(dd);
-            if (pCurrent == pLast) {
-                pNewLink -> pNext = NULL;
-                pLast = pNewLink;
-            }
-            else {
-                pNewLink -> pNext = pCurrent -> pNext;
-                pCurrent -> pNext -> pPrevious = pNewLink;
-            }
-            pNewLink -> pPrevious = pCurrent;
-            pCurrent -> pNext = pNewLink;
-            return true;
-        }
-
-        bool removeKey(double key) {
-            Link* pCurrent = pFirst;
-            while (pCurrent -> dData != key) {
-                pCurrent = pCurrent -> pNext;
-                if (pCurrent == NULL)
-                    return false;
-            }
-            if (pCurrent == pFirst)
-                pFirst = pCurrent -> pNext;
-            else
-                pCurrent -> pPrevious -> pNext = pCurrent -> pNext;
-
-            if (pCurrent == pLast)
-                pLast = pCurrent -> pPrevious;
-            else
-                pCurrent -> pNext -> pPrevious = pCurrent -> pPrevious;
-            delete pCurrent;
-            return true;
-        }
-
-        void displayForward() {
-            cout << "List (first --> last): ";
-            Link* pCurrent = pFirst;
-            while (pCurrent != NULL) {
-                pCurrent -> displayLink();
-                pCurrent = pCurrent -> pNext;
-            }
-            cout << endl;
-        }
-
-        void displayBackward() {
-            cout << "List (last --> first): ";
-            Link* pCurrent = pLast;
-            while (pCurrent != NULL) {
-                pCurrent -> displayLink();
-                pCurrent = pCurrent -> pPrevious;
-            }
-            cout << endl;
-        }
-
-        void priorityInsert(double dd) {
-            insertFirst(dd);
-        }
-
-        double priorityRemove() {
-            double temp = pLast -> dData;
-            removeLast();
-            return temp;
-        }
-};
-
-int main() {
-    
-    DoublyLinkedList pqList;
-    pqList.priorityInsert(50);
-    pqList.priorityInsert(40);
-    pqList.priorityInsert(30);
-    pqList.priorityInsert(20);
-    pqList.priorityInsert(10);
-    cout << "---------- PriorityQueue ----------" << endl;
-    pqList.displayForward();
-
-    cout << "Calling priorityRemove()" << endl;
-    double key = pqList.priorityRemove();
-    cout << "Removed node with key " << key << endl;
-    pqList.displayForward();
-    key = pqList.priorityRemove();
-    cout << "Removed node with key " << key << endl;
-    pqList.displayForward();
+    for (int count = 0; count < NUM_VEHICLES; count++)
+    {
+        Print(vehiclePtr[count]);
+    }
 
     return 0;
+}
+
+void Print(Vehicle * vptr)
+{
+    vptr->print();
 }

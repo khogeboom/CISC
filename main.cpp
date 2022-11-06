@@ -1,88 +1,84 @@
 #include <iostream>
-#include "Set.h"
 using namespace std;
 
-int main() {
-    int arr1[6] = {2, 1, 4, 3, 5, 4};
-    cout<<"int arr1[] = {2, 1, 4, 3, 5, 4}"<<endl;
-    Set set1(arr1,6);
-    cout << "Set1(arr1): ";
-    set1.display();
+int ArraySum(int[]);
+int RowSums(int[][5], int);
+bool IsDiverse(int[][5]);
+
+int main()
+{
+    // Part 1
+    int array1[5];
+    for (int i = 0; i < 5; i++)
+        array1[i] = rand() % 10;
+    for (int j = 0; j < 5; j++)
+        cout << array1[j] << " ";
+    cout << endl;
+    int sum = ArraySum(array1);
+    cout << "Sum = " << sum << endl;
     cout << endl;
 
-    cout<<"adding 1, 3, 5 again then 6 and 7"<<endl;
-    set1.add(1);
-    set1.add(3);
-    set1.add(5);
-    set1.add(6);
-    set1.add(7);
 
-    cout << "Set1: ";
-    set1.display();
-
-    // remove an existing element and a non-existing element
-    cout<<"Remove(7); Remove(9)"<<endl;
-    set1.Remove(7);
-    set1.Remove(9);
-    cout << "Set1: ";
-    set1.display();
-    cout<<endl;
-
-    cout << endl;
-    cout << "Creating set2, copying the former set. (Testing copy constructor)" << endl;
-    Set set2(set1);
-    cout << "Set2: ";
-    set2.display();
+    // Part 2
+    int array2d[4][5];
+    for (int k = 0; k < 4; k++) {
+        for (int m = 0; m < 5; m++) {
+            array2d[k][m] = rand() % 10;
+        }
+    }
+    int sums[4];
+    for (int r = 0; r < 4; r++) {
+        sums[r] = RowSums(array2d, r);
+    }
+    for (int i = 0; i < 4; i++) {
+        for (int j = 0; j < 5; j++) {
+            cout << array2d[i][j] << " ";
+        }
+        cout << " = " << sums[i] << endl;
+    }
     cout << endl;
 
-    int arr3[4] = {0, 1, 4, 9};
-    Set set3(arr3, 4);
-    cout << "Set3: ";
-    set3.display();
-    cout << endl;
-
-    cout << "The union of set1 and set3 is: " << endl;
-    Set unionSet = set1.Union(set3);
-    unionSet.display();
-    cout << endl;
-
-    cout << "intersectSet = set1.Intersection(set3)" << endl;
-    Set intersectSet = set1.Intersection(set3);
-    intersectSet.display();
-    cout << endl;
-
-    // Test - the difference between two sets
-    cout << "diffSet = unionSet.Difference(intersectSet)" << endl;
-    Set diffSet = unionSet.Difference(intersectSet);
-    diffSet.display();
-    cout << endl;
-
-    // Test == if two sets are equal
-    Set set4(set1);
-    cout << "Set4(set1): ";
-    set4.display();
-    cout << endl;
-
-    cout << "set1: ";
-    set1.display();
-    cout << "set4: ";
-    set4.display();
-    if (set1.Equal(set4))
-        cout<<"set1 is equal to set4"<<endl;
+    bool diversity = IsDiverse(array2d);
+    if (diversity)
+        cout << "array2d is diverse" << endl;
     else
-        cout<<"set1.Equal(set4) failed"<<endl;
-    cout << endl;
-
-    // Test != if two sets are not equal
-    cout << "set1: ";
-    set1.display();
-    cout << "set3: ";
-    set3.display();
-    if (!(set1.Equal(set3)))
-        cout<<"set1 is not equal to set3"<<endl;
-    else
-        cout<<"!(set1.Equal(set3 ) failed"<<endl;
-    cout << endl;
+        cout << "array2d is not diverse" << endl;
 
     return 0;
+}
+
+int ArraySum(int array1[])
+{
+    int sum = 0;
+    for (int i = 0; i < 5; i++)
+    {
+        sum += array1[i];
+    }
+    return sum;
+}
+
+int RowSums(int array2d[][5], int r)
+{
+    int sums = 0;
+    for (int i = 0; i < 5; i++) {
+        sums += array2d[r][i];
+    }
+    return sums;
+}
+
+bool IsDiverse(int array2d[][5])
+{
+    int sums[4];
+    for (int r = 0; r < 4; r++) {
+        sums[r] = RowSums(array2d, r);
+    }
+    for (int i = 0; i < 4; i++) {
+        for (int j = i+1; j < 4; j++) {
+            if (sums[i] == sums[j]) {
+                cout << sums[i] << " is a duplicate" << endl;
+                return false;
+            }
+        }
+    }
+    return true;
 }

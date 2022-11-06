@@ -1,58 +1,171 @@
-#include "ArrayBag.h"
 #include <iostream>
 using namespace std;
 
-int main()
-{
-    typedef  int bag_type;
-    bag_type value;
-    int initSize = 15;
-    ArrayBag bag(initSize);
+class Link {
+    public:
+        double dData;
+        Link* pNext;
+        Link* pPrevious;
 
-    cout<<"Capacity (No. of items the bag can hold): "<<initSize<<endl;
+    public:
+        Link(double dd): dData(dd), pNext(NULL), pPrevious(NULL) {}
+        void displayLink() {
+            cout << dData << " ";
+        }
+};
 
-    cout << "\nAdding 4 elements" <<endl;
-    bag.add(12);
-    bag.add(212);
-    bag.add(1);
-    bag.add(123);
-    bag.printBag();
+class DoublyLinkedList {
+    private:
+        Link* pFirst;
+        Link* pLast;
 
-    cout <<"\nAdding 4 elements"<<endl;
-    bag.add(142);
-    bag.add(12);
-    bag.add(19);
-    bag.add(131);
-    bag.printBag();
+    public:
+        DoublyLinkedList() : pFirst(NULL), pLast(NULL) {}
+        ~DoublyLinkedList() {
+            Link* pCurrent = pFirst;
+            while (pCurrent != NULL) {
+                Link* pOldCur = pCurrent;
+                pCurrent = pCurrent -> pNext;
+                delete pOldCur;
+            }
+        }
 
-    // Remove element
-    int key=17;
-    cout << "\nRemoving "<<key<<endl;
-    bag.remove(key);
+        bool isEmpty() {
+            return pFirst == NULL;
+        }
 
-    key=12;
-    cout << "\nRemoving "<<key<<endl;
-    bag.remove(key);
-    bag.printBag();
+        void insertFirst(double dd) {
+            Link* pNewLink = new Link(dd);
+            if (isEmpty())
+                pLast = pNewLink;
+            else
+                pFirst -> pPrevious = pNewLink;
+            pNewLink -> pNext = pFirst;
+            pFirst = pNewLink;
+        }
 
-    cout << "\nNew bag" <<endl;
-    ArrayBag newBag(initSize);
-    newBag.add(1);
-    newBag.add(19);
-    newBag.add(12);
-    newBag.printBag();
+        void insertLast(double dd) {
+            Link* pNewLink = new Link(dd);
+            if (isEmpty())
+                pFirst = pNewLink;
+            else {
+                pLast -> pNext = pNewLink;
+                pNewLink -> pPrevious = pLast;
+            }
+            pLast = pNewLink;
+        }
 
-    if (bag.containsAll(newBag))
-        cout<< "\nBag contains all elements of newBag"<<endl;
-    else
-        cout<< "\nBag does not contain all elements of newBag"<<endl;
+        void removeFirst() {
+            Link* pTemp = pFirst;
+            if (pFirst -> pNext == NULL)
+                pLast = NULL;
+            else
+                pFirst -> pNext -> pPrevious = NULL;
+            pFirst = pFirst -> pNext;
 
-    cout<<"\nAdding 24 to newBag"<<endl;
-    newBag.add(24);
-    newBag.printBag();
+            delete pTemp;
+        }
 
-    if (bag.containsAll(newBag))
-        cout<< "\nBag contains all elements of newBag"<<endl;
-    else
-        cout<< "\nBag does not contain all elements of newBag"<<endl;
+        void removeLast() {
+            Link* pTemp = pLast;
+            if (pFirst -> pNext == NULL)
+                pFirst = NULL;
+            else
+                pLast -> pPrevious -> pNext = NULL;
+            pLast = pLast -> pPrevious;
+            delete pTemp;
+        }
+
+        bool insertAfter(double key, double dd) {
+            Link* pCurrent = pFirst;
+            while (pCurrent -> dData != key) {
+                pCurrent = pCurrent -> pNext;
+                if(pCurrent == NULL)
+                    return false;
+            }
+            Link* pNewLink = new Link(dd);
+            if (pCurrent == pLast) {
+                pNewLink -> pNext = NULL;
+                pLast = pNewLink;
+            }
+            else {
+                pNewLink -> pNext = pCurrent -> pNext;
+                pCurrent -> pNext -> pPrevious = pNewLink;
+            }
+            pNewLink -> pPrevious = pCurrent;
+            pCurrent -> pNext = pNewLink;
+            return true;
+        }
+
+        bool removeKey(double key) {
+            Link* pCurrent = pFirst;
+            while (pCurrent -> dData != key) {
+                pCurrent = pCurrent -> pNext;
+                if (pCurrent == NULL)
+                    return false;
+            }
+            if (pCurrent == pFirst)
+                pFirst = pCurrent -> pNext;
+            else
+                pCurrent -> pPrevious -> pNext = pCurrent -> pNext;
+
+            if (pCurrent == pLast)
+                pLast = pCurrent -> pPrevious;
+            else
+                pCurrent -> pNext -> pPrevious = pCurrent -> pPrevious;
+            delete pCurrent;
+            return true;
+        }
+
+        void displayForward() {
+            cout << "List (first --> last): ";
+            Link* pCurrent = pFirst;
+            while (pCurrent != NULL) {
+                pCurrent -> displayLink();
+                pCurrent = pCurrent -> pNext;
+            }
+            cout << endl;
+        }
+
+        void displayBackward() {
+            cout << "List (last --> first): ";
+            Link* pCurrent = pLast;
+            while (pCurrent != NULL) {
+                pCurrent -> displayLink();
+                pCurrent = pCurrent -> pPrevious;
+            }
+            cout << endl;
+        }
+
+        void priorityInsert(double dd) {
+            insertFirst(dd);
+        }
+
+        double priorityRemove() {
+            double temp = pLast -> dData;
+            removeLast();
+            return temp;
+        }
+};
+
+int main() {
+    
+    DoublyLinkedList pqList;
+    pqList.priorityInsert(50);
+    pqList.priorityInsert(40);
+    pqList.priorityInsert(30);
+    pqList.priorityInsert(20);
+    pqList.priorityInsert(10);
+    cout << "---------- PriorityQueue ----------" << endl;
+    pqList.displayForward();
+
+    cout << "Calling priorityRemove()" << endl;
+    double key = pqList.priorityRemove();
+    cout << "Removed node with key " << key << endl;
+    pqList.displayForward();
+    key = pqList.priorityRemove();
+    cout << "Removed node with key " << key << endl;
+    pqList.displayForward();
+
+    return 0;
 }

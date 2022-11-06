@@ -1,78 +1,81 @@
 #include <iostream>
 #include <iomanip>
 #include <vector>
-#include "Employee.h"
-#include "SalariedEmployee.h"
-#include "HourlyEmployee.h"
-#include "CommissionEmployee.h"
-#include "BasePlusCommissionEmployee.h"
 using namespace std;
 
-void virtualViaPointer( Employee *  ); // prototype
-void virtualViaReference(  Employee & ); // prototype
+class Items {
+    private:
+        string item;
+        double cost;
+    public:
+        Items() {
+            item = "";
+            cost = 0;
+        }
+        Items(string itemName, double value) {
+            item = itemName;
+            cost = value;
+        }
+        void SetItemName(string itemName) {
+            item = itemName;
+        }
+        void SetItemCost(double value) {
+            cost = value;
+        }
+        string GetItemName() {
+            return item;
+        }
+        double GetItemCost() {
+            return cost;
+        }
+};
 
-int main()
-{
-    // set floating-point output formatting
-    cout << fixed << setprecision( 2 );
+int main() {
+    cout << fixed << setprecision(2);
+    double maxCost;
+    int maxItems;
+    cin >> maxCost;
+    cin >> maxItems;
 
-    // create derived-class objects
-    SalariedEmployee salariedEmployee("John", "Smith", "111-11-1111", 800 );
-    HourlyEmployee hourlyEmployee("Karen", "Price", "222-22-2222", 16.75, 40 );
-    CommissionEmployee commissionEmployee("Sue", "Jones", "333-33-3333", 10000, .06 );
-    BasePlusCommissionEmployee basePlusCommissionEmployee("Bob", "Lewis", "444-44-4444", 5000, .04, 300 );
+    string itemName;
+    double cost;
+    Items items[maxItems];
+    for (int i = 0; i < maxItems; i++) {
+        cin >> itemName;
+        cin >> cost;
+        items[i].SetItemName(itemName);
+        items[i].SetItemCost(cost);
+    }
 
-    cout << "Employees processed individually using static binding:\n\n";
+    // sort items
+    Items temp;
+    int j = 0;
+    for (int i = 1; i < maxItems; i++) {
+        j = i;
+        while (j > 0 && items[j].GetItemCost() > items[j-1].GetItemCost()) {
+            temp = items[j-1];
+            items[j-1] = items[j];
+            items[j] = temp;
+            j--;
+        }
+    }
 
-    // output each Employee’s information and earnings using static binding
-    salariedEmployee.print();
-    cout << "\nearned $" <<salariedEmployee.earnings() << "\n\n";
-    hourlyEmployee.print();
-    cout << "\nearned $" <<hourlyEmployee.earnings() << "\n\n";
-    commissionEmployee.print();
-    cout << "\nearned $" << commissionEmployee.earnings()<< "\n\n";
-    basePlusCommissionEmployee.print();
-    cout << "\nearned $" << basePlusCommissionEmployee.earnings()<< "\n\n";
+    // select which items to purchase
+    vector<Items> purchased;
+    double sum = 0;
+    for (int j = 0; j < maxItems; j++) {
+        if (sum + items[j].GetItemCost() <= maxCost) {
+            sum += items[j].GetItemCost();
+            purchased.push_back(items[j]);
+        }
+    }
 
-    // create vector of four base-class pointers
-    vector < Employee * > employees( 4 );
+    // display purchased items
+    for (int k = 0; k < purchased.size(); k++) {
+        cout << purchased[k].GetItemName() << " " << purchased[k].GetItemCost() << endl;
+    }
+    if (maxCost - sum != 0)
+        cout << maxCost - sum << endl;
 
-    // initialize vector with Employees
-    employees[ 0 ] = &salariedEmployee;
-    employees[ 1 ] = &hourlyEmployee;
-    employees[ 2 ] = &commissionEmployee;
-    employees[ 3 ] = &basePlusCommissionEmployee;
-
-    cout << "Employees processed polymorphically via dynamic binding:\n\n";
-
-    // call virtualViaPointer to print each Employee's information
-    // and earnings using dynamic binding
-    cout << "Virtual function calls made off base-class pointers:\n\n";
-
-    for ( int i = 0; i < employees.size(); i++ )
-        virtualViaPointer( employees[ i ] );
-
-    // call virtualViaReference to print each Employee's information
-    // and earnings using dynamic binding
-    cout << "Virtual function calls made off base-class references:\n\n";
-
-    for ( int i = 0; i < employees.size(); i++ )
-        virtualViaReference( *employees[ i ] ); // note dereferencing
-
-}// end main
-
-// call Employee virtual functions print and earnings off a
-// base-class pointer using dynamic binding
-void virtualViaPointer(  Employee *  baseClassPtr )
-{
-    baseClassPtr->print();
-    cout << "\nearned $" << baseClassPtr->earnings() << "\n\n";
-} // end function virtualViaPointer
-
-// call Employee virtual functions print and earnings off a
-// base-class reference using dynamic binding
-void virtualViaReference(  Employee &baseClassRef )
-{
-    baseClassRef.print();
-    cout << "\nearned $" << baseClassRef.earnings() << "\n\n";
-} // end function virtualViaReference
+    return 0;
+}
